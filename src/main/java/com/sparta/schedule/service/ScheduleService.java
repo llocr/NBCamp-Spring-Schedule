@@ -38,10 +38,15 @@ public class ScheduleService {
     }
 
     public ScheduleResponseDTO getSchedule(Long id) {
+        Schedule schedule = findScheduleById(id);
+        return new ScheduleResponseDTO(schedule);
+    }
+
+    private Schedule findScheduleById(Long id) {
         Optional<Schedule> findSchedule = scheduleRepository.findById(id);
 
         if(findSchedule.isPresent()) {
-            return new ScheduleResponseDTO(findSchedule.get());
+            return findSchedule.get();
         } else {
             throw new IllegalArgumentException("해당 스케줄이 존재하지 않습니다.");
         }
