@@ -7,6 +7,7 @@ import com.sparta.schedule.repository.ScheduleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,10 +27,20 @@ public class ScheduleService {
         return new ScheduleResponseDTO(saveSchedule);
     }
 
+    public List<ScheduleResponseDTO> getAllSchedules() {
+        List<Schedule> scheduleList = scheduleRepository.findAll();
+
+        if(!scheduleList.isEmpty()) {
+            return scheduleList.stream().map(ScheduleResponseDTO::new).toList();
+        } else {
+            throw new IllegalArgumentException("등록된 스케줄이 없습니다.");
+        }
+    }
+
     public ScheduleResponseDTO getSchedule(Long id) {
         Optional<Schedule> findSchedule = scheduleRepository.findById(id);
 
-        if(!findSchedule.isEmpty()) {
+        if(findSchedule.isPresent()) {
             return new ScheduleResponseDTO(findSchedule.get());
         } else {
             throw new IllegalArgumentException("해당 스케줄이 존재하지 않습니다.");

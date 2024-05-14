@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -64,4 +66,13 @@ class ScheduleServiceTest {
         assertThat(illegalArgumentException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
     }
 
+    @Test
+    @DisplayName("등록된 전체 스케줄 조회 테스트")
+    void 전체스케줄조회테스트() {
+        //when
+        List<ScheduleResponseDTO> scheduleList = scheduleService.getAllSchedules();
+
+        //then
+        assertThat(scheduleList).isNotEmpty();
+    }
 }
