@@ -2,11 +2,9 @@ package com.sparta.schedule.controller;
 
 import com.sparta.schedule.dto.ScheduleRequestDTO;
 import com.sparta.schedule.dto.ScheduleResponseDTO;
+import com.sparta.schedule.entity.Schedule;
 import com.sparta.schedule.service.ScheduleService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -20,5 +18,10 @@ public class ScheduleController {
     @PostMapping("/schedule")
     public ScheduleResponseDTO saveSchedule(@RequestBody ScheduleRequestDTO requestDTO) {
         return scheduleService.saveSchedule(requestDTO);
+    }
+
+    @GetMapping("/schedule/{id}")
+    public ScheduleResponseDTO getSchedule(@PathVariable Long id) {
+        return scheduleService.getSchedule(id);
     }
 }

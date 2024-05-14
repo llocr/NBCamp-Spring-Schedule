@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 @SpringBootTest
 class ScheduleServiceTest {
@@ -30,8 +32,36 @@ class ScheduleServiceTest {
         ScheduleResponseDTO scheduleResponseDTO = scheduleService.saveSchedule(requestDTO);
 
         //then
-        assertEquals(requestDTO.getNickname(), scheduleResponseDTO.getNickname());
-        assertEquals(requestDTO.getTitle(), scheduleResponseDTO.getTitle());
-        assertEquals(requestDTO.getContents(), scheduleResponseDTO.getContents());
+        assertThat(requestDTO.getTitle()).isEqualTo(scheduleResponseDTO.getTitle());
+        assertThat(requestDTO.getContents()).isEqualTo(scheduleResponseDTO.getContents());
+        assertThat(requestDTO.getNickname()).isEqualTo(scheduleResponseDTO.getNickname());
     }
+
+    @Test
+    @DisplayName("선택된 스케줄 조회 성공 테스트")
+    void 선택된스케줄조회성공() {
+        //given
+        Long id = 2L;
+
+        //when
+        ScheduleResponseDTO findSchedule = scheduleService.getSchedule(id);
+
+        //then
+        assertThat(id).isEqualTo(findSchedule.getId());
+    }
+
+    @Test
+    @DisplayName("선택된 스케줄 조회 실패 테스트")
+    void 선택된스케줄조회실패() {
+        //given
+        Long id = 0L;
+
+        //when
+        IllegalArgumentException illegalArgumentException =
+                assertThrows(IllegalArgumentException.class, () -> scheduleService.getSchedule(id));
+
+        //then
+        assertThat(illegalArgumentException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
+    }
+
 }
