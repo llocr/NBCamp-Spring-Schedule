@@ -15,4 +15,12 @@ public class ScheduleService {
     public ScheduleService(ScheduleRepository scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
     }
+
+    @Transactional
+    public ScheduleResponseDTO saveSchedule(ScheduleRequestDTO requestDTO) {
+        Schedule schedule = new Schedule(requestDTO);
+        Schedule saveSchedule = scheduleRepository.save(schedule);
+
+        return new ScheduleResponseDTO(saveSchedule);
+    }
 }
