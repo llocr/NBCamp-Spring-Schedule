@@ -19,6 +19,9 @@ public class ScheduleService {
         this.scheduleRepository = scheduleRepository;
     }
 
+    /*
+    1. 일정 추가
+     */
     @Transactional
     public ScheduleResponseDTO saveSchedule(ScheduleRequestDTO requestDTO) {
         Schedule schedule = new Schedule(requestDTO);
@@ -27,6 +30,9 @@ public class ScheduleService {
         return new ScheduleResponseDTO(saveSchedule);
     }
 
+    /*
+    2. 일정 전체 조회
+     */
     public List<ScheduleResponseDTO> getAllSchedules() {
         List<Schedule> scheduleList = scheduleRepository.findAll();
 
@@ -37,11 +43,17 @@ public class ScheduleService {
         }
     }
 
+    /*
+    3. 선택한 일정 조회
+     */
     public ScheduleResponseDTO getSchedule(Long id) {
         Schedule schedule = findScheduleById(id);
         return new ScheduleResponseDTO(schedule);
     }
 
+    /*
+    4. 선택한 일정 수정
+     */
     @Transactional
     public ScheduleResponseDTO updateSchedule(Long id, ScheduleRequestDTO requestDTO) {
         Schedule schedule = findScheduleById(id);
@@ -51,6 +63,9 @@ public class ScheduleService {
         return new ScheduleResponseDTO(schedule);
     }
 
+    /*
+    5. 선택한 일정 삭제
+     */
     @Transactional
     public Long deleteSchedule(Long id, String password) {
         Schedule schedule = findScheduleById(id);
@@ -62,6 +77,9 @@ public class ScheduleService {
         return schedule.getId();
     }
 
+    /*
+    아이디로 Schedule 검색
+     */
     private Schedule findScheduleById(Long id) {
         Optional<Schedule> findSchedule = scheduleRepository.findById(id);
 
@@ -72,6 +90,9 @@ public class ScheduleService {
         }
     }
 
+    /*
+    비밀번호 유효성 확인
+     */
     private void validatePassword(Schedule schedule, String password) {
         if (!schedule.getPassword().equals(password)) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
