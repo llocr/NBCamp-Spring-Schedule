@@ -42,6 +42,15 @@ public class ScheduleService {
         return new ScheduleResponseDTO(schedule);
     }
 
+    @Transactional
+    public ScheduleResponseDTO updateSchedule(Long id, ScheduleRequestDTO requestDTO) {
+        Schedule schedule = findScheduleById(id);
+        validatePassword(schedule, requestDTO.getPassword());
+
+        schedule.update(requestDTO);
+        return new ScheduleResponseDTO(schedule);
+    }
+
     private Schedule findScheduleById(Long id) {
         Optional<Schedule> findSchedule = scheduleRepository.findById(id);
 
@@ -49,6 +58,12 @@ public class ScheduleService {
             return findSchedule.get();
         } else {
             throw new IllegalArgumentException("해당 스케줄이 존재하지 않습니다.");
+        }
+    }
+
+    private void validatePassword(Schedule schedule, String password) {
+        if (!schedule.getPassword().equals(password)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
     }
 }

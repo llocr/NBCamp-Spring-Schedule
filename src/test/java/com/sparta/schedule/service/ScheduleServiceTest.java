@@ -75,4 +75,65 @@ class ScheduleServiceTest {
         //then
         assertThat(scheduleList).isNotEmpty();
     }
+
+    @Test
+    @Transactional
+    @DisplayName("스케줄 수정 테스트")
+    void 스케줄수정성공테스트() {
+        //given
+        Long id = 2L;
+        ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
+        requestDTO.setTitle("수정된 테스트입니다.");
+        requestDTO.setContents("오늘의 스케줄은 무엇일까요?");
+        requestDTO.setNickname("heesue");
+        requestDTO.setPassword("1234");
+
+        //when
+        ScheduleResponseDTO updateSchedule = scheduleService.updateSchedule(id, requestDTO);
+
+        //then
+        assertThat(requestDTO.getTitle()).isEqualTo(updateSchedule.getTitle());
+        assertThat(requestDTO.getContents()).isEqualTo(updateSchedule.getContents());
+        assertThat(requestDTO.getNickname()).isEqualTo(updateSchedule.getNickname());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("스케줄 수정 실패 테스트_비밀번호오류")
+    void 스케줄수정실패테스트_비밀번호오류() {
+        //given
+        Long id = 2L;
+        ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
+        requestDTO.setTitle("수정된 테스트입니다.");
+        requestDTO.setContents("오늘의 스케줄은 무엇일까요?");
+        requestDTO.setNickname("heesue");
+        requestDTO.setPassword("12345");
+
+        //when
+        IllegalArgumentException illegalArgumentException =
+                assertThrows(IllegalArgumentException.class, () -> scheduleService.updateSchedule(id, requestDTO));
+
+        //then
+        assertThat(illegalArgumentException.getMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("스케줄 수정 실패 테스트_해당스케줄없음")
+    void 스케줄수정실패테스트_해당스케줄없음() {
+        //given
+        Long id = 0L;
+        ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
+        requestDTO.setTitle("수정된 테스트입니다.");
+        requestDTO.setContents("오늘의 스케줄은 무엇일까요?");
+        requestDTO.setNickname("heesue");
+        requestDTO.setPassword("1234");
+
+        //when
+        IllegalArgumentException illegalArgumentException =
+                assertThrows(IllegalArgumentException.class, () -> scheduleService.updateSchedule(id, requestDTO));
+
+        //then
+        assertThat(illegalArgumentException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
+    }
 }
