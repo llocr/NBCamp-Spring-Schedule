@@ -136,4 +136,51 @@ class ScheduleServiceTest {
         //then
         assertThat(illegalArgumentException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
     }
+
+    @Test
+    @Transactional
+    @DisplayName("스케줄 삭제 성공 테스트")
+    void 스케줄삭제성공테스트() {
+        //given
+        Long id = 2L;
+        String password = "1234";
+
+        //when
+        Long deleteSchedule = scheduleService.deleteSchedule(id, password);
+
+        //then
+        assertThat(id).isEqualTo(deleteSchedule);
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("스케줄 삭제 실패 테스트_비밀번호오류")
+    void 스케줄삭제실패테스트_비밀번호오류() {
+        //given
+        Long id = 2L;
+        String password = "5678";
+
+        //when
+        IllegalArgumentException illegalArgumentException =
+                assertThrows(IllegalArgumentException.class, () -> scheduleService.deleteSchedule(id, password));
+
+        //then
+        assertThat(illegalArgumentException.getMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("스케줄 삭제 실패 테스트_해당스케줄없음")
+    void 스케줄삭제실패테스트_해당스케줄없음() {
+        //given
+        Long id = 0L;
+        String password = "1234";
+
+        //when
+        IllegalArgumentException illegalArgumentException =
+                assertThrows(IllegalArgumentException.class, () -> scheduleService.deleteSchedule(id, password));
+
+        //then
+        assertThat(illegalArgumentException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
+    }
 }

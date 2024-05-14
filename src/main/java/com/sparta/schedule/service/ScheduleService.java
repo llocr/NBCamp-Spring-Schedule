@@ -51,6 +51,17 @@ public class ScheduleService {
         return new ScheduleResponseDTO(schedule);
     }
 
+    @Transactional
+    public Long deleteSchedule(Long id, String password) {
+        Schedule schedule = findScheduleById(id);
+        System.out.println("schedule.getPassword() = " + schedule.getPassword());
+        System.out.println("password = " + password);
+        validatePassword(schedule, password);
+
+        scheduleRepository.delete(schedule);
+        return schedule.getId();
+    }
+
     private Schedule findScheduleById(Long id) {
         Optional<Schedule> findSchedule = scheduleRepository.findById(id);
 
