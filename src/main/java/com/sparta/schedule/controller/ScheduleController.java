@@ -4,6 +4,7 @@ import com.sparta.schedule.dto.PasswordDTO;
 import com.sparta.schedule.dto.ScheduleRequestDTO;
 import com.sparta.schedule.dto.ScheduleResponseDTO;
 import com.sparta.schedule.service.ScheduleService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class ScheduleController {
     }
 
     @PostMapping("/schedule")
-    public ResponseEntity<ScheduleResponseDTO> saveSchedule(@RequestBody ScheduleRequestDTO requestDTO) {
+    public ResponseEntity<ScheduleResponseDTO> saveSchedule(@Valid @RequestBody ScheduleRequestDTO requestDTO) {
         ScheduleResponseDTO responseDTO = scheduleService.saveSchedule(requestDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
@@ -38,13 +39,13 @@ public class ScheduleController {
     }
 
     @PutMapping("/schedule/{id}")
-    public ResponseEntity<ScheduleResponseDTO> updateSchedule(@PathVariable Long id, @RequestBody ScheduleRequestDTO requestDTO){
+    public ResponseEntity<ScheduleResponseDTO> updateSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleRequestDTO requestDTO){
         ScheduleResponseDTO responseDTO = scheduleService.updateSchedule(id, requestDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @DeleteMapping("/schedule/{id}")
-    public ResponseEntity<Long> deleteSchedule(@PathVariable Long id, @RequestBody PasswordDTO passwordDTO) {
+    public ResponseEntity<Long> deleteSchedule(@PathVariable Long id,@Valid @RequestBody PasswordDTO passwordDTO) {
         Long deleteSchedule = scheduleService.deleteSchedule(id, passwordDTO.getPassword());
         return new ResponseEntity<>(deleteSchedule, HttpStatus.OK);
     }
