@@ -10,7 +10,7 @@ public class ScheduleResponseDTO {
     private Long id;
     private String title;
     private String contents;
-    private String nickname;
+    private String email;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 
@@ -18,7 +18,7 @@ public class ScheduleResponseDTO {
         this.id = schedule.getId();
         this.title = schedule.getTitle();
         this.contents = schedule.getContents();
-        this.nickname = schedule.getNickname();
+        this.email = schedule.getEmail();
         this.createDate = schedule.getCreateDate();
         this.modifyDate = schedule.getModifyDate();
     }

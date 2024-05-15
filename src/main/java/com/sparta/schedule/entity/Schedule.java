@@ -23,7 +23,7 @@ public class Schedule  extends Timestamped{
     private String contents;
 
     @Column(nullable = false)
-    private String nickname;
+    private String email;
 
     @Column(nullable = false)
     private String password;
@@ -31,13 +31,13 @@ public class Schedule  extends Timestamped{
     public Schedule(ScheduleRequestDTO requestDTO) {
         this.title = requestDTO.getTitle();
         this.contents = requestDTO.getContents();
-        this.nickname = requestDTO.getNickname();
+        this.email = requestDTO.getEmail();
         this.password = requestDTO.getPassword();
     }
 
     public void update(ScheduleRequestDTO requestDTO) {
         this.title = requestDTO.getTitle();
         this.contents = requestDTO.getContents();
-        this.nickname = requestDTO.getNickname();
+        this.email = requestDTO.getEmail();
     }
 }
