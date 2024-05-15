@@ -28,4 +28,9 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity<String> handleFileUploadException(FileUploadException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }
