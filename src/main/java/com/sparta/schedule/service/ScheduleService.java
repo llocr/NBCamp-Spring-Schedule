@@ -3,6 +3,8 @@ package com.sparta.schedule.service;
 import com.sparta.schedule.dto.ScheduleRequestDTO;
 import com.sparta.schedule.dto.ScheduleResponseDTO;
 import com.sparta.schedule.entity.Schedule;
+import com.sparta.schedule.exception.InvalidPasswordException;
+import com.sparta.schedule.exception.ScheduleNotFoundException;
 import com.sparta.schedule.repository.ScheduleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,7 +86,7 @@ public class ScheduleService {
         if(findSchedule.isPresent()) {
             return findSchedule.get();
         } else {
-            throw new IllegalArgumentException("해당 스케줄이 존재하지 않습니다.");
+            throw new ScheduleNotFoundException();
         }
     }
 
@@ -93,7 +95,7 @@ public class ScheduleService {
      */
     private void validatePassword(Schedule schedule, String password) {
         if (!schedule.getPassword().equals(password)) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new InvalidPasswordException();
         }
     }
 }
