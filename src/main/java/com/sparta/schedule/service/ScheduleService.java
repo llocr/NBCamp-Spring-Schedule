@@ -69,8 +69,6 @@ public class ScheduleService {
     @Transactional
     public Long deleteSchedule(Long id, String password) {
         Schedule schedule = findScheduleById(id);
-        System.out.println("schedule.getPassword() = " + schedule.getPassword());
-        System.out.println("password = " + password);
         validatePassword(schedule, password);
 
         scheduleRepository.delete(schedule);
