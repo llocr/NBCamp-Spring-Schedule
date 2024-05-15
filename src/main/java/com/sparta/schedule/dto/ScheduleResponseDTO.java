@@ -1,11 +1,13 @@
 package com.sparta.schedule.dto;
 
 import com.sparta.schedule.entity.Schedule;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Schema(description = "일정 응답 DTO")
 public class ScheduleResponseDTO {
     private Long id;
     private String title;
