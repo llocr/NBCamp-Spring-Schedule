@@ -36,7 +36,7 @@ public class ScheduleService {
     2. 일정 전체 조회
      */
     public List<ScheduleResponseDTO> getAllSchedules() {
-        List<Schedule> scheduleList = scheduleRepository.findAll();
+        List<Schedule> scheduleList = scheduleRepository.findAllByOrderByModifyDateDesc();
 
         if(!scheduleList.isEmpty()) {
             return scheduleList.stream().map(ScheduleResponseDTO::new).toList();
