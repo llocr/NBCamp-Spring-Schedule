@@ -22,7 +22,7 @@ public class FileUploadController {
         this.fileUploadService = fileUploadService;
     }
 
-    @PostMapping("/file-upload")
+    @PostMapping("/files")
     @Operation(summary = "File upload", description = "파일을 업로드합니다.")
     public ResponseEntity<List<FileDTO>> uploadFiles(
             @RequestParam("files") List<MultipartFile> files,
