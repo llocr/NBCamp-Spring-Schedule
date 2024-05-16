@@ -2,6 +2,8 @@ package com.sparta.schedule.service;
 
 import com.sparta.schedule.dto.ScheduleRequestDTO;
 import com.sparta.schedule.dto.ScheduleResponseDTO;
+import com.sparta.schedule.exception.InvalidPasswordException;
+import com.sparta.schedule.exception.ScheduleNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
@@ -27,7 +29,7 @@ class ScheduleServiceTest {
         ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
         requestDTO.setTitle("테스트입니다.");
         requestDTO.setContents("오늘의 스케줄은 없습니다.");
-        requestDTO.setNickname("heesue");
+        requestDTO.setEmail("heesue");
         requestDTO.setPassword("1234");
 
         //when
@@ -36,7 +38,7 @@ class ScheduleServiceTest {
         //then
         assertThat(requestDTO.getTitle()).isEqualTo(scheduleResponseDTO.getTitle());
         assertThat(requestDTO.getContents()).isEqualTo(scheduleResponseDTO.getContents());
-        assertThat(requestDTO.getNickname()).isEqualTo(scheduleResponseDTO.getNickname());
+        assertThat(requestDTO.getEmail()).isEqualTo(scheduleResponseDTO.getEmail());
     }
 
     @Test
@@ -59,11 +61,11 @@ class ScheduleServiceTest {
         Long id = 0L;
 
         //when
-        IllegalArgumentException illegalArgumentException =
-                assertThrows(IllegalArgumentException.class, () -> scheduleService.getSchedule(id));
+        ScheduleNotFoundException scheduleNotFoundException =
+                assertThrows(ScheduleNotFoundException.class, () -> scheduleService.getSchedule(id));
 
         //then
-        assertThat(illegalArgumentException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
+        assertThat(scheduleNotFoundException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
     }
 
     @Test
@@ -85,7 +87,7 @@ class ScheduleServiceTest {
         ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
         requestDTO.setTitle("수정된 테스트입니다.");
         requestDTO.setContents("오늘의 스케줄은 무엇일까요?");
-        requestDTO.setNickname("heesue");
+        requestDTO.setEmail("heesue");
         requestDTO.setPassword("1234");
 
         //when
@@ -94,7 +96,7 @@ class ScheduleServiceTest {
         //then
         assertThat(requestDTO.getTitle()).isEqualTo(updateSchedule.getTitle());
         assertThat(requestDTO.getContents()).isEqualTo(updateSchedule.getContents());
-        assertThat(requestDTO.getNickname()).isEqualTo(updateSchedule.getNickname());
+        assertThat(requestDTO.getEmail()).isEqualTo(updateSchedule.getEmail());
     }
 
     @Test
@@ -106,15 +108,15 @@ class ScheduleServiceTest {
         ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
         requestDTO.setTitle("수정된 테스트입니다.");
         requestDTO.setContents("오늘의 스케줄은 무엇일까요?");
-        requestDTO.setNickname("heesue");
+        requestDTO.setEmail("heesue");
         requestDTO.setPassword("12345");
 
         //when
-        IllegalArgumentException illegalArgumentException =
-                assertThrows(IllegalArgumentException.class, () -> scheduleService.updateSchedule(id, requestDTO));
+        InvalidPasswordException invalidPasswordException =
+                assertThrows(InvalidPasswordException.class, () -> scheduleService.updateSchedule(id, requestDTO));
 
         //then
-        assertThat(illegalArgumentException.getMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
+        assertThat(invalidPasswordException.getMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
     }
 
     @Test
@@ -126,15 +128,15 @@ class ScheduleServiceTest {
         ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
         requestDTO.setTitle("수정된 테스트입니다.");
         requestDTO.setContents("오늘의 스케줄은 무엇일까요?");
-        requestDTO.setNickname("heesue");
+        requestDTO.setEmail("heesue");
         requestDTO.setPassword("1234");
 
         //when
-        IllegalArgumentException illegalArgumentException =
-                assertThrows(IllegalArgumentException.class, () -> scheduleService.updateSchedule(id, requestDTO));
+        ScheduleNotFoundException scheduleNotFoundException =
+                assertThrows(ScheduleNotFoundException.class, () -> scheduleService.updateSchedule(id, requestDTO));
 
         //then
-        assertThat(illegalArgumentException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
+        assertThat(scheduleNotFoundException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
     }
 
     @Test
@@ -161,11 +163,11 @@ class ScheduleServiceTest {
         String password = "5678";
 
         //when
-        IllegalArgumentException illegalArgumentException =
-                assertThrows(IllegalArgumentException.class, () -> scheduleService.deleteSchedule(id, password));
+        InvalidPasswordException invalidPasswordException =
+                assertThrows(InvalidPasswordException.class, () -> scheduleService.deleteSchedule(id, password));
 
         //then
-        assertThat(illegalArgumentException.getMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
+        assertThat(invalidPasswordException.getMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
     }
 
     @Test
@@ -177,10 +179,10 @@ class ScheduleServiceTest {
         String password = "1234";
 
         //when
-        IllegalArgumentException illegalArgumentException =
-                assertThrows(IllegalArgumentException.class, () -> scheduleService.deleteSchedule(id, password));
+        ScheduleNotFoundException scheduleNotFoundException =
+                assertThrows(ScheduleNotFoundException.class, () -> scheduleService.deleteSchedule(id, password));
 
         //then
-        assertThat(illegalArgumentException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
+        assertThat(scheduleNotFoundException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
     }
 }
