@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: nbcamp-spring-schedule
+  datasource:
+    url: jdbc:mysql://localhost:3306/nbcamp
+    username: root
+    password: 6797
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+file:
+  upload-dir: ./files/
+springdoc:
+  swagger-ui:
+    groups-order: desc
+    tags-sorter: alpha
+    operations-sorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  paths-to-match: /api/**
