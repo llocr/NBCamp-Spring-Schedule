@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sparta.schedule.dto.PasswordDTO;
+import com.sparta.schedule.dto.ResponseMessage;
 import com.sparta.schedule.dto.ScheduleRequestDTO;
 import com.sparta.schedule.dto.ScheduleResponseDTO;
 import com.sparta.schedule.service.ScheduleService;
@@ -34,36 +35,71 @@ public class ScheduleController {
 
 	@PostMapping
 	@Operation(summary = "Post schedule", description = "일정을 추가합니다.")
-	public ResponseEntity<ScheduleResponseDTO> saveSchedule(@Valid @RequestBody ScheduleRequestDTO requestDTO) {
+	public ResponseEntity<ResponseMessage<ScheduleResponseDTO>> saveSchedule(@Valid @RequestBody ScheduleRequestDTO requestDTO) {
 		ScheduleResponseDTO responseDTO = scheduleService.saveSchedule(requestDTO);
-		return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+
+		ResponseMessage<ScheduleResponseDTO> responseMessage = ResponseMessage.<ScheduleResponseDTO>builder()
+			.statusCode(HttpStatus.CREATED.value())
+			.message("일정이 추가되었습니다.")
+			.data(responseDTO)
+			.build();
+
+		return new ResponseEntity<>(responseMessage, HttpStatus.CREATED);
 	}
 
 	@GetMapping
 	@Operation(summary = "Get all schedules", description = "모든 일정을 조회합니다.")
-	public ResponseEntity<List<ScheduleResponseDTO>> getAllSchedules() {
-		List<ScheduleResponseDTO> scheduleList = scheduleService.getAllSchedules();
-		return new ResponseEntity<>(scheduleList, HttpStatus.OK);
+	public ResponseEntity<ResponseMessage<List<ScheduleResponseDTO>>> getAllSchedules() {
+		List<ScheduleResponseDTO> responseLit = scheduleService.getAllSchedules();
+
+		ResponseMessage<List<ScheduleResponseDTO>> responseMessage = ResponseMessage.<List<ScheduleResponseDTO>>builder()
+			.statusCode(HttpStatus.OK.value())
+			.message("목록 조회가 완료되었습니다.")
+			.data(responseLit)
+			.build();
+
+		return new ResponseEntity<>(responseMessage, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
 	@Operation(summary = "Get schedule", description = "선택한 일정을 조회합니다.")
-	public ResponseEntity<ScheduleResponseDTO> getSchedule(@PathVariable Long id) {
+	public ResponseEntity<ResponseMessage<ScheduleResponseDTO>> getSchedule(@PathVariable Long id) {
 		ScheduleResponseDTO responseDTO = scheduleService.getSchedule(id);
-		return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+
+		ResponseMessage<ScheduleResponseDTO> responseMessage = ResponseMessage.<ScheduleResponseDTO>builder()
+			.statusCode(HttpStatus.OK.value())
+			.message("선택한 일정 조회가 완료되었습니다.")
+			.data(responseDTO)
+			.build();
+
+		return new ResponseEntity<>(responseMessage, HttpStatus.OK);
 	}
 
 	@PutMapping("/{id}")
 	@Operation(summary = "Update schedule", description = "선택한 일정을 수정합니다.")
-	public ResponseEntity<ScheduleResponseDTO> updateSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleRequestDTO requestDTO) {
+	public ResponseEntity<ResponseMessage<ScheduleResponseDTO>> updateSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleRequestDTO requestDTO) {
 		ScheduleResponseDTO responseDTO = scheduleService.updateSchedule(id, requestDTO);
-		return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+
+		ResponseMessage<ScheduleResponseDTO> responseMessage = ResponseMessage.<ScheduleResponseDTO>builder()
+			.statusCode(HttpStatus.OK.value())
+			.message("선택한 일정 수정이 완료되었습니다.")
+			.data(responseDTO)
+			.build();
+
+		return new ResponseEntity<>(responseMessage, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
 	@Operation(summary = "Delete schedule", description = "선택한 일정을 삭제합니다.")
-	public ResponseEntity<Long> deleteSchedule(@PathVariable Long id, @Valid @RequestBody PasswordDTO passwordDTO) {
-		Long deleteSchedule = scheduleService.deleteSchedule(id, passwordDTO.getPassword());
-		return new ResponseEntity<>(deleteSchedule, HttpStatus.OK);
+	public ResponseEntity<ResponseMessage<Long>> deleteSchedule(@PathVariable Long id, @Valid @RequestBody PasswordDTO passwordDTO) {
+		Long responseData = scheduleService.deleteSchedule(id, passwordDTO.getPassword());
+
+		ResponseMessage<Long> responseMessage = ResponseMessage.<Long>builder()
+			.statusCode(HttpStatus.OK.value())
+			.message("선택한 일정 삭제가 완료되었습니다.")
+			.data(responseData)
+			.build();
+
+		return new ResponseEntity<>(responseMessage, HttpStatus.OK);
 	}
 }
