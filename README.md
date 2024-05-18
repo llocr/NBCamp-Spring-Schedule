@@ -19,6 +19,8 @@
 | 선택한 일정 삭제 | DELETE | `/api/schedule/{id}` | `{ "password": "1234" }`                                                                                     | `{"statusCode" 200,"message": "선택한 일정 삭제가 완료되었습니다.","data": 2}`                                                                                                                                                                                                                                                                                                                                                                                                         |
 | 파일 업로드    | POST   | `/api/files`         | **Body - [form-data]** <br> files(File) : “증명1.jpg”, <br> description(Text) : “사진입니다”                        | `{"statusCode": 200,"message": "파일 업로드가 완료되었습니다.","data": [{"originalFileName": "증명1.jpg","savedName": "4b5e10aa-8066-45ff-a626-0bb0c9f8c22b_증명1.jpg","filePath": "./files/4b5e10aa-8066-45ff-a626-0bb0c9f8c22b_증명1.jpg","description": "사진에 대한 설명입니다"},{"originalFileName": "증명2.jpg","savedName": "0b4da3a2-31e6-41f3-a2f7-95a197249a85_증명2.jpg","filePath": "./files/0b4da3a2-31e6-41f3-a2f7-95a197249a85_증명2.jpg","description": "사진에 대한 설명입니다"}]}` |
 
+**[POSTMAN으로 보기]** : https://documenter.getpostman.com/view/28179041/2sA3JT4eQP
+
 **[노션으로 보기]** : https://369696.notion.site/8b24dfdf2cc44f0daf074af9c4d0b4a0?v=fb59d80dd1754bfabecdc1abfbf17920&pvs=4
 
 ## 📍 ERD
