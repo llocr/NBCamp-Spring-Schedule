@@ -13,14 +13,13 @@ import com.sparta.schedule.exception.InvalidPasswordException;
 import com.sparta.schedule.exception.ScheduleNotFoundException;
 import com.sparta.schedule.repository.ScheduleRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ScheduleService {
 	private final ScheduleRepository scheduleRepository;
-
-	public ScheduleService(ScheduleRepository scheduleRepository) {
-		this.scheduleRepository = scheduleRepository;
-	}
 
 	/*
 	1. 일정 추가

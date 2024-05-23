@@ -22,16 +22,14 @@ import com.sparta.schedule.service.ScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/schedule")
+@RequiredArgsConstructor
 @Tag(name = "Schedule", description = "Schedule API")
 public class ScheduleController {
 	private final ScheduleService scheduleService;
-
-	public ScheduleController(ScheduleService scheduleService) {
-		this.scheduleService = scheduleService;
-	}
 
 	@PostMapping
 	@Operation(summary = "Post schedule", description = "일정을 추가합니다.")

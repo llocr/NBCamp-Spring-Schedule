@@ -17,16 +17,14 @@ import com.sparta.schedule.service.FileUploadService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 @Tag(name = "File Upload", description = "File Upload API")
 public class FileUploadController {
 	private final FileUploadService fileUploadService;
-
-	public FileUploadController(FileUploadService fileUploadService) {
-		this.fileUploadService = fileUploadService;
-	}
 
 	@PostMapping("/files")
 	@Operation(summary = "File upload", description = "파일을 업로드합니다.")
