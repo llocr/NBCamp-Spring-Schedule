@@ -33,4 +33,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleFileUploadException(FileUploadException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+	@ExceptionHandler(UserException.class)
+	public ResponseEntity<String> handleUserException(UserException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
 }
