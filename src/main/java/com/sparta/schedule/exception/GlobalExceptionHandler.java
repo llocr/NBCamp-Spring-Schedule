@@ -1,5 +1,6 @@
 package com.sparta.schedule.exception;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -7,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -23,10 +26,22 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-		String message = e.getBindingResult().getFieldErrors().stream()
-			.map(error -> error.getField() + " " + error.getDefaultMessage())
-			.collect(Collectors.joining(", "));
-		return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+		Map<String, String> errors = e.getBindingResult().getFieldErrors().stream()
+			.collect(Collectors.toMap(
+				error -> error.getField(),
+				error -> error.getDefaultMessage(),
+				(existingValue, newValue) -> existingValue
+			));
+
+		ObjectMapper mapper = new ObjectMapper();
+		String response = "";
+		try {
+			response = mapper.writeValueAsString(errors);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(FileUploadException.class)
