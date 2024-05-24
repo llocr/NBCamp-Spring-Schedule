@@ -20,16 +20,20 @@ import com.sparta.schedule.dto.ResponseMessage;
 import com.sparta.schedule.security.UserDetailsImpl;
 import com.sparta.schedule.service.CommentService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/schedules/{scheduleId}/comments")
+@Tag(name = "Comment", description = "Comment API")
 public class CommentController {
 	private final CommentService commentService;
 
 	@PostMapping
+	@Operation(summary = "Post comment", description = "댓글을 추가합니다.")
 	public ResponseEntity<ResponseMessage<CommentResponseDTO>> createComment(@PathVariable Long scheduleId,
 		@Valid @RequestBody CommentRequestDTO requestDTO, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 		CommentResponseDTO responseDTO = commentService.createComment(scheduleId, requestDTO, userDetails.getUser());
@@ -44,6 +48,7 @@ public class CommentController {
 	}
 
 	@GetMapping("/{commentId}")
+	@Operation(summary = "Get comment", description = "선택한 댓글을 조회합니다.")
 	public ResponseEntity<ResponseMessage<CommentResponseDTO>> getComment(@PathVariable Long scheduleId, @PathVariable Long commentId) {
 		CommentResponseDTO responseDTO = commentService.getComment(scheduleId, commentId);
 
@@ -57,6 +62,7 @@ public class CommentController {
 	}
 
 	@GetMapping
+	@Operation(summary = "Get all comments", description = "해당 게시글은 전체 댓글을 조회합니다.")
 	public ResponseEntity<ResponseMessage<List<CommentResponseDTO>>> getAllComments(@PathVariable Long scheduleId) {
 		List<CommentResponseDTO> responseDTOList = commentService.getAllComments(scheduleId);
 
@@ -70,6 +76,7 @@ public class CommentController {
 	}
 
 	@PutMapping("/{commentId}")
+	@Operation(summary = "Update comment", description = "선택한 댓글을 수정합니다.")
 	public ResponseEntity<ResponseMessage<CommentResponseDTO>> updateComment(@PathVariable Long scheduleId, @PathVariable Long commentId,
 		@Valid @RequestBody CommentRequestDTO requestDTO, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 		CommentResponseDTO responseDTO = commentService.updateComment(scheduleId, commentId, requestDTO, userDetails.getUser());
@@ -84,6 +91,7 @@ public class CommentController {
 	}
 
 	@DeleteMapping("/{commentId}")
+	@Operation(summary = "Delete comment", description = "선택한 댓글을 삭제합니다.")
 	public ResponseEntity<ResponseMessage<Long>> deleteComment(@PathVariable Long scheduleId, @PathVariable Long commentId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		Long responseData = commentService.deleteComment(scheduleId, commentId, userDetails.getUser());

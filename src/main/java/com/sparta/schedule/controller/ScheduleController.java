@@ -47,7 +47,7 @@ public class ScheduleController {
 	}
 
 	@GetMapping
-	@Operation(summary = "Get all schedules", description = "모든 일정을 조회합니다.")
+	@Operation(summary = "Get all schedules", description = "전체 일정을 조회합니다.")
 	public ResponseEntity<ResponseMessage<List<ScheduleResponseDTO>>> getAllSchedules() {
 		List<ScheduleResponseDTO> responseLit = scheduleService.getAllSchedules();
 

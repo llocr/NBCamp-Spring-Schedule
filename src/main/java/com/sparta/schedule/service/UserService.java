@@ -22,6 +22,9 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
+	/*
+	1. 회원가입
+	 */
 	@Transactional
 	public UserResponseDTO createUser(UserRequestDTO requestDTO) {
 		//이름 유효성 검사
@@ -42,6 +45,9 @@ public class UserService {
 		return new UserResponseDTO(saveUser);
 	}
 
+	/*
+	권한 설정
+	 */
 	private static UserRole getUserRole(UserRequestDTO requestDTO) {
 		String inputRole = requestDTO.getUserRole();
 		UserRole role = null;
@@ -57,6 +63,9 @@ public class UserService {
 		return role;
 	}
 
+	/*
+	usename 중복 검사
+	 */
 	private void validateUserName(String username) {
 		Optional<User> findUser = userRepository.findByUsername(username);
 		if (findUser.isPresent()) {

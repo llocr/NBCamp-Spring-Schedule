@@ -5,11 +5,13 @@ import java.time.LocalDateTime;
 import com.sparta.schedule.entity.User;
 import com.sparta.schedule.entity.UserRole;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Schema(description = "유저 응답 DTO")
 public class UserResponseDTO {
 	private Long id;
 	private String username;

@@ -68,11 +68,10 @@ public class CommentService {
 		}
 	}
 
-
 	/*
 	4. 댓글 수정
 	 */
-
+	@Transactional
 	public CommentResponseDTO updateComment(Long scheduleId, Long commentId, CommentRequestDTO requestDTO, User user) {
 		//스케줄 존재하는지 확인
 		Schedule schedule = findScheduleById(scheduleId);
@@ -87,6 +86,7 @@ public class CommentService {
 	/*
 	5. 댓글 삭제
 	 */
+	@Transactional
 	public Long deleteComment(Long scheduleId, Long commentId, User user) {
 		//스케줄 존재하는지 확인
 		findScheduleById(scheduleId);
@@ -109,10 +109,10 @@ public class CommentService {
 			throw new ScheduleNotFoundException();
 		}
 	}
+
 	/*
 	아이디로 댓글 & 댓글 작성자 찾기
 	 */
-
 	private Comment findCommentById(Long commentId, Long userID) {
 		Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 		if (comment.getUser().getId().equals(userID)) {

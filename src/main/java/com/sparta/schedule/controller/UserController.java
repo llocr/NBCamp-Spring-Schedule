@@ -12,16 +12,20 @@ import com.sparta.schedule.dto.UserRequestDTO;
 import com.sparta.schedule.dto.UserResponseDTO;
 import com.sparta.schedule.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
+@Tag(name = "User", description = "User API")
 public class UserController {
 	private final UserService userService;
 
 	@PostMapping("/signup")
+	@Operation(summary = "Sign up", description = "회원가입을 진행합니다.")
 	public ResponseEntity<ResponseMessage<UserResponseDTO>> createUser(@Valid @RequestBody UserRequestDTO requestDTO) {
 		UserResponseDTO responseDTO = userService.createUser(requestDTO);
 

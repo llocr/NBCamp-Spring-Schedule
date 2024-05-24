@@ -19,11 +19,6 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 	}
 
-	@ExceptionHandler(InvalidPasswordException.class)
-	public ResponseEntity<String> handleInvalidPasswordException(InvalidPasswordException e) {
-		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-	}
-
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 		Map<String, String> errors = e.getBindingResult().getFieldErrors().stream()
