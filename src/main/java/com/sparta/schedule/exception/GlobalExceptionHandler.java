@@ -44,8 +44,8 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
 	}
 
-	@ExceptionHandler(JwtException.class)
-	public ResponseEntity<String> handleJwtException(JwtException e) {
+	@ExceptionHandler(TokenException.class)
+	public ResponseEntity<String> handleJwtException(TokenException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
 	}
 }

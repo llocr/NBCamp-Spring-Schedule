@@ -10,10 +10,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.sparta.schedule.exception.TokenException;
 import com.sparta.schedule.security.UserDetailsServiceImpl;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +37,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		if (StringUtils.hasText(token)) {
 
 			if (!jwtUtil.validateToken(token)) {
-				throw new JwtException("토큰이 유효하지 않습니다.");
+				throw new TokenException("토큰이 유효하지 않습니다.");
 			}
 
 			Claims info = jwtUtil.getUserInfoFromToken(token);
@@ -45,7 +45,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 			try {
 				setAuthentication(info.getSubject());
 			} catch (Exception e) {
-				throw new JwtException("인증 정보를 찾을 수 없습니다.");
+				throw new TokenException("인증 정보를 찾을 수 없습니다.");
 			}
 		}
 

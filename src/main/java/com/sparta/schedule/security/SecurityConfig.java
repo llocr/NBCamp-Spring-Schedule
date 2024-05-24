@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.sparta.schedule.jwt.JwtAuthenticationFilter;
 import com.sparta.schedule.jwt.JwtAuthorizationFilter;
+import com.sparta.schedule.jwt.JwtExceptionFilter;
 import com.sparta.schedule.jwt.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class SecurityConfig {
 	private final JwtUtil jwtUtil;
 	private final UserDetailsServiceImpl userDetailsService;
 	private final AuthenticationConfiguration authenticationConfiguration;
+	private final JwtExceptionFilter jwtExceptionFilter;
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -51,6 +53,9 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class);
+
 		http.csrf((csrf) -> csrf.disable());
 
 		http.sessionManagement((sessionManagement) ->

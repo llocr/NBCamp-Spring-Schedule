@@ -70,7 +70,7 @@ public class JwtUtil {
 			return true;
 		} catch (SecurityException | MalformedJwtException | SignatureException |
 				 ExpiredJwtException | UnsupportedJwtException | IllegalArgumentException e) {
-			throw new IllegalStateException("잘못된 토큰입니다.");
+			return false;
 		}
 	}
 
