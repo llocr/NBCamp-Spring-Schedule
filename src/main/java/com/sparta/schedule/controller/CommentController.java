@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,5 +37,19 @@ public class CommentController {
 			.build();
 
 		return new ResponseEntity<>(responseMessage, HttpStatus.CREATED);
+	}
+
+	@PutMapping("/{commentId}")
+	public ResponseEntity<ResponseMessage<CommentResponseDTO>> updateComment(@PathVariable Long scheduleId, @PathVariable Long commentId,
+		@Valid @RequestBody CommentRequestDTO requestDTO, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+		CommentResponseDTO responseDTO = commentService.updateComment(scheduleId, commentId, requestDTO, userDetails.getUser());
+
+		ResponseMessage<CommentResponseDTO> responseMessage = ResponseMessage.<CommentResponseDTO>builder()
+			.statusCode(HttpStatus.OK.value())
+			.message("댓글이 수정되었습니다.")
+			.data(responseDTO)
+			.build();
+
+		return new ResponseEntity<>(responseMessage, HttpStatus.OK);
 	}
 }

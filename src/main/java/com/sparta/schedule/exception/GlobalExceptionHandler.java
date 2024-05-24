@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		
+
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 
@@ -62,5 +62,10 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(TokenException.class)
 	public ResponseEntity<String> handleJwtException(TokenException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+	}
+
+	@ExceptionHandler(CommentNotFoundException.class)
+	public ResponseEntity<String> handleCommentNotFoundException(CommentNotFoundException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 	}
 }

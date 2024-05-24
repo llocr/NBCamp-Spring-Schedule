@@ -1,5 +1,7 @@
 package com.sparta.schedule.entity;
 
+import com.sparta.schedule.dto.CommentRequestDTO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -40,5 +42,9 @@ public class Comment extends Timestamped {
 		this.contents = contents;
 		this.user = user;
 		this.schedule = schedule;
+	}
+
+	public void update(CommentRequestDTO requestDTO) {
+		this.contents = requestDTO.getContents();
 	}
 }
