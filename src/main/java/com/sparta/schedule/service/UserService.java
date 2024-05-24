@@ -60,7 +60,7 @@ public class UserService {
 	private void validateUserName(String username) {
 		Optional<User> findUser = userRepository.findByUsername(username);
 		if (findUser.isPresent()) {
-			throw new UserException("이미 존재하는 이름입니다.");
+			throw new UserException("중복된 username 입니다.");
 		}
 	}
 }
