@@ -1,5 +1,6 @@
 package com.sparta.schedule.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -39,6 +40,39 @@ public class CommentService {
 		return new CommentResponseDTO(comment);
 	}
 
+	/*
+	2. 댓글 조회
+	 */
+	public CommentResponseDTO getComment(Long scheduleId, Long commentId) {
+		//스케줄 존재하는지 확인
+		findScheduleById(scheduleId);
+
+		//댓글 존재하는지 확인
+		Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+		return new CommentResponseDTO(comment);
+	}
+
+	/*
+	3. 해당 게시글 전체 댓글 조회
+	 */
+	public List<CommentResponseDTO> getAllComments(Long scheduleId) {
+		//스케줄 존재하는지 확인
+		findScheduleById(scheduleId);
+
+		List<Comment> commentList = commentRepository.findAllByScheduleId(scheduleId);
+		if (!commentList.isEmpty()) {
+			return commentList.stream().map(CommentResponseDTO::new).toList();
+		} else {
+			throw new CommentNotFoundException();
+		}
+	}
+
+
+	/*
+	4. 댓글 수정
+	 */
+
 	public CommentResponseDTO updateComment(Long scheduleId, Long commentId, CommentRequestDTO requestDTO, User user) {
 		//스케줄 존재하는지 확인
 		Schedule schedule = findScheduleById(scheduleId);
@@ -51,8 +85,22 @@ public class CommentService {
 	}
 
 	/*
+	5. 댓글 삭제
+	 */
+	public Long deleteComment(Long scheduleId, Long commentId, User user) {
+		//스케줄 존재하는지 확인
+		findScheduleById(scheduleId);
+
+		//댓글 존재하는지 & 댓글 작성자인지 확인
+		Comment comment = findCommentById(commentId, user.getId());
+		commentRepository.delete(comment);
+
+		return commentId;
+	}
+	/*
 	아이디로 스케줄 찾기
 	 */
+
 	private Schedule findScheduleById(Long scheduleId) {
 		Optional<Schedule> findSchedule = scheduleRepository.findById(scheduleId);
 		if (findSchedule.isPresent()) {
@@ -61,10 +109,10 @@ public class CommentService {
 			throw new ScheduleNotFoundException();
 		}
 	}
-
 	/*
 	아이디로 댓글 & 댓글 작성자 찾기
 	 */
+
 	private Comment findCommentById(Long commentId, Long userID) {
 		Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 		if (comment.getUser().getId().equals(userID)) {
@@ -73,4 +121,5 @@ public class CommentService {
 			throw new UserException("댓글 작성자가 아닙니다.");
 		}
 	}
+
 }
