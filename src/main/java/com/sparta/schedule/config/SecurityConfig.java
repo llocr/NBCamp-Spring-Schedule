@@ -1,4 +1,4 @@
-package com.sparta.schedule.security;
+package com.sparta.schedule.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +17,7 @@ import com.sparta.schedule.jwt.JwtAuthenticationFilter;
 import com.sparta.schedule.jwt.JwtAuthorizationFilter;
 import com.sparta.schedule.jwt.JwtExceptionFilter;
 import com.sparta.schedule.jwt.JwtUtil;
+import com.sparta.schedule.security.UserDetailsServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -63,6 +64,7 @@ public class SecurityConfig {
 
 		http.authorizeHttpRequests((authorizeHttpRequests) ->
 			authorizeHttpRequests
+				.requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-resources/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/schedules/**").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/users/login").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll()
