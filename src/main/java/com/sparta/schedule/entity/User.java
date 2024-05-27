@@ -37,10 +37,10 @@ public class User extends Timestamped {
 	@Enumerated(value = EnumType.STRING)
 	private UserRole userRole;
 
-	@OneToMany(mappedBy = "user")
+	@OneToMany(mappedBy = "user", orphanRemoval = true)
 	private List<Schedule> scheduleList;
 
-	@OneToMany(mappedBy = "user")
+	@OneToMany(mappedBy = "user", orphanRemoval = true)
 	private List<Comment> commentList;
 
 	@Builder

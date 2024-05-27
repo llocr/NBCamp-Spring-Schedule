@@ -39,7 +39,7 @@ public class Schedule extends Timestamped {
 	@Column(nullable = false)
 	private String contents;
 
-	@OneToMany(mappedBy = "schedule")
+	@OneToMany(mappedBy = "schedule", orphanRemoval = true)
 	private List<Comment> comments = new ArrayList<>();
 
 	@Builder
