@@ -54,8 +54,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		String username = ((UserDetailsImpl)authResult.getPrincipal()).getUsername();
 		UserRole role = ((UserDetailsImpl)authResult.getPrincipal()).getUser().getUserRole();
 
-		String token = jwtUtil.createToken(username, role);
-		response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
+		String accessToken = jwtUtil.createToken(username, role);
+		String refreshToken = jwtUtil.createRefreshToken(username, role);
+
+		response.addHeader(JwtUtil.AUTHORIZATION_HEADER, accessToken);
+		response.addHeader(JwtUtil.REFRESHTOKEN_HEADER, refreshToken);
+
+		jwtUtil.saveRefreshToken(refreshToken.substring(7));
 
 		ResponseEntity<ResponseMessage<String>> responseEntity = createResponseEntity(HttpStatus.OK, "로그인에 성공했습니다.", authResult);
 
