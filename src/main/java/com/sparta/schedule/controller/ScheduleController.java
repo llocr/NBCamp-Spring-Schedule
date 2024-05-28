@@ -10,14 +10,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.sparta.schedule.dto.ResponseMessage;
 import com.sparta.schedule.dto.ScheduleRequestDTO;
 import com.sparta.schedule.dto.ScheduleResponseDTO;
+import com.sparta.schedule.entity.UploadFile;
 import com.sparta.schedule.security.UserDetailsImpl;
+import com.sparta.schedule.service.FileUploadService;
 import com.sparta.schedule.service.ScheduleService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,11 +34,21 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Schedule", description = "Schedule API")
 public class ScheduleController {
 	private final ScheduleService scheduleService;
+	private final FileUploadService fileUploadService;
 
 	@PostMapping
 	@Operation(summary = "Post schedule", description = "일정을 추가합니다.")
-	public ResponseEntity<ResponseMessage<ScheduleResponseDTO>> saveSchedule(@Valid @RequestBody ScheduleRequestDTO requestDTO, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-		ScheduleResponseDTO responseDTO = scheduleService.saveSchedule(requestDTO, userDetails.getUser());
+	public ResponseEntity<ResponseMessage<ScheduleResponseDTO>> saveSchedule(
+		@RequestPart("schedule") @Valid ScheduleRequestDTO requestDTO,
+		@RequestPart(name = "file", required = false) MultipartFile file,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+		UploadFile uploadFile = null;
+		if (file != null && !file.isEmpty()) {
+			uploadFile = fileUploadService.storeFile(file);
+		}
+
+		ScheduleResponseDTO responseDTO = scheduleService.saveSchedule(requestDTO, userDetails.getUser(), uploadFile);
 
 		ResponseMessage<ScheduleResponseDTO> responseMessage = ResponseMessage.<ScheduleResponseDTO>builder()
 			.statusCode(HttpStatus.CREATED.value())
@@ -76,9 +89,18 @@ public class ScheduleController {
 
 	@PutMapping("/{id}")
 	@Operation(summary = "Update schedule", description = "선택한 일정을 수정합니다.")
-	public ResponseEntity<ResponseMessage<ScheduleResponseDTO>> updateSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleRequestDTO requestDTO,
+	public ResponseEntity<ResponseMessage<ScheduleResponseDTO>> updateSchedule(
+		@PathVariable Long id,
+		@RequestPart("schedule") @Valid ScheduleRequestDTO requestDTO,
+		@RequestPart(name = "file", required = false) MultipartFile file,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		ScheduleResponseDTO responseDTO = scheduleService.updateSchedule(id, requestDTO, userDetails.getUser());
+
+		UploadFile uploadFile = null;
+		if (file != null && !file.isEmpty()) {
+			uploadFile = fileUploadService.storeFile(file);
+		}
+
+		ScheduleResponseDTO responseDTO = scheduleService.updateSchedule(id, requestDTO, userDetails.getUser(), uploadFile);
 
 		ResponseMessage<ScheduleResponseDTO> responseMessage = ResponseMessage.<ScheduleResponseDTO>builder()
 			.statusCode(HttpStatus.OK.value())

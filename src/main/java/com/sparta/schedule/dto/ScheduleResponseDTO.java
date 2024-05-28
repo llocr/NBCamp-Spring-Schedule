@@ -3,6 +3,7 @@ package com.sparta.schedule.dto;
 import java.time.LocalDateTime;
 
 import com.sparta.schedule.entity.Schedule;
+import com.sparta.schedule.entity.UploadFile;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -14,6 +15,7 @@ public class ScheduleResponseDTO {
 	private Long id;
 	private String title;
 	private String contents;
+	private String file;
 	private LocalDateTime createDate;
 	private LocalDateTime modifyDate;
 
@@ -24,6 +26,11 @@ public class ScheduleResponseDTO {
 		this.contents = schedule.getContents();
 		this.createDate = schedule.getCreateDate();
 		this.modifyDate = schedule.getModifyDate();
+
+		UploadFile file = schedule.getFile();
+		if (file != null) {
+			this.file = file.getName();
+		}
 	}
 
 }

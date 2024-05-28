@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sparta.schedule.dto.ScheduleRequestDTO;
 import com.sparta.schedule.dto.ScheduleResponseDTO;
 import com.sparta.schedule.entity.Schedule;
+import com.sparta.schedule.entity.UploadFile;
 import com.sparta.schedule.entity.User;
 import com.sparta.schedule.exception.ScheduleNotFoundException;
 import com.sparta.schedule.exception.TokenException;
@@ -26,8 +27,8 @@ public class ScheduleService {
 	1. 일정 추가
 	 */
 	@Transactional
-	public ScheduleResponseDTO saveSchedule(ScheduleRequestDTO requestDTO, User user) {
-		Schedule schedule = requestDTO.toEntity(user);
+	public ScheduleResponseDTO saveSchedule(ScheduleRequestDTO requestDTO, User user, UploadFile uploadFile) {
+		Schedule schedule = requestDTO.toEntity(user, uploadFile);
 		Schedule saveSchedule = scheduleRepository.save(schedule);
 
 		return new ScheduleResponseDTO(saveSchedule);
@@ -58,11 +59,11 @@ public class ScheduleService {
 	4. 선택한 일정 수정
 	 */
 	@Transactional
-	public ScheduleResponseDTO updateSchedule(Long id, ScheduleRequestDTO requestDTO, User user) {
+	public ScheduleResponseDTO updateSchedule(Long id, ScheduleRequestDTO requestDTO, User user, UploadFile file) {
 		Schedule schedule = findScheduleById(id);
 		validateUser(schedule, user);
 
-		schedule.update(requestDTO);
+		schedule.update(requestDTO, file);
 		return new ScheduleResponseDTO(schedule);
 	}
 

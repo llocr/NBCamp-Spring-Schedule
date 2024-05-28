@@ -1,6 +1,7 @@
 package com.sparta.schedule.dto;
 
 import com.sparta.schedule.entity.Schedule;
+import com.sparta.schedule.entity.UploadFile;
 import com.sparta.schedule.entity.User;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,11 +24,12 @@ public class ScheduleRequestDTO {
 	@Schema(description = "schedule contents", example = "내용")
 	private String contents;
 
-	public Schedule toEntity(User user) {
+	public Schedule toEntity(User user, UploadFile uploadFile) {
 		return Schedule.builder()
 			.user(user)
 			.title(title)
 			.contents(contents)
+			.file(uploadFile)
 			.build();
 	}
 }
