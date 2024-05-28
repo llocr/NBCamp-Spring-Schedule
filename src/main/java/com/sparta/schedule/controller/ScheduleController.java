@@ -4,19 +4,23 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.sparta.schedule.dto.PasswordDTO;
 import com.sparta.schedule.dto.ResponseMessage;
 import com.sparta.schedule.dto.ScheduleRequestDTO;
 import com.sparta.schedule.dto.ScheduleResponseDTO;
+import com.sparta.schedule.entity.UploadFile;
+import com.sparta.schedule.security.UserDetailsImpl;
+import com.sparta.schedule.service.FileUploadService;
 import com.sparta.schedule.service.ScheduleService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,11 +34,21 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Schedule", description = "Schedule API")
 public class ScheduleController {
 	private final ScheduleService scheduleService;
+	private final FileUploadService fileUploadService;
 
 	@PostMapping
 	@Operation(summary = "Post schedule", description = "일정을 추가합니다.")
-	public ResponseEntity<ResponseMessage<ScheduleResponseDTO>> saveSchedule(@Valid @RequestBody ScheduleRequestDTO requestDTO) {
-		ScheduleResponseDTO responseDTO = scheduleService.saveSchedule(requestDTO);
+	public ResponseEntity<ResponseMessage<ScheduleResponseDTO>> saveSchedule(
+		@RequestPart("schedule") @Valid ScheduleRequestDTO requestDTO,
+		@RequestPart(name = "file", required = false) MultipartFile file,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+		UploadFile uploadFile = null;
+		if (file != null && !file.isEmpty()) {
+			uploadFile = fileUploadService.storeFile(file);
+		}
+
+		ScheduleResponseDTO responseDTO = scheduleService.saveSchedule(requestDTO, userDetails.getUser(), uploadFile);
 
 		ResponseMessage<ScheduleResponseDTO> responseMessage = ResponseMessage.<ScheduleResponseDTO>builder()
 			.statusCode(HttpStatus.CREATED.value())
@@ -46,7 +60,7 @@ public class ScheduleController {
 	}
 
 	@GetMapping
-	@Operation(summary = "Get all schedules", description = "모든 일정을 조회합니다.")
+	@Operation(summary = "Get all schedules", description = "전체 일정을 조회합니다.")
 	public ResponseEntity<ResponseMessage<List<ScheduleResponseDTO>>> getAllSchedules() {
 		List<ScheduleResponseDTO> responseLit = scheduleService.getAllSchedules();
 
@@ -75,8 +89,18 @@ public class ScheduleController {
 
 	@PutMapping("/{id}")
 	@Operation(summary = "Update schedule", description = "선택한 일정을 수정합니다.")
-	public ResponseEntity<ResponseMessage<ScheduleResponseDTO>> updateSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleRequestDTO requestDTO) {
-		ScheduleResponseDTO responseDTO = scheduleService.updateSchedule(id, requestDTO);
+	public ResponseEntity<ResponseMessage<ScheduleResponseDTO>> updateSchedule(
+		@PathVariable Long id,
+		@RequestPart("schedule") @Valid ScheduleRequestDTO requestDTO,
+		@RequestPart(name = "file", required = false) MultipartFile file,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+		UploadFile uploadFile = null;
+		if (file != null && !file.isEmpty()) {
+			uploadFile = fileUploadService.storeFile(file);
+		}
+
+		ScheduleResponseDTO responseDTO = scheduleService.updateSchedule(id, requestDTO, userDetails.getUser(), uploadFile);
 
 		ResponseMessage<ScheduleResponseDTO> responseMessage = ResponseMessage.<ScheduleResponseDTO>builder()
 			.statusCode(HttpStatus.OK.value())
@@ -89,8 +113,8 @@ public class ScheduleController {
 
 	@DeleteMapping("/{id}")
 	@Operation(summary = "Delete schedule", description = "선택한 일정을 삭제합니다.")
-	public ResponseEntity<ResponseMessage<Long>> deleteSchedule(@PathVariable Long id, @Valid @RequestBody PasswordDTO passwordDTO) {
-		Long responseData = scheduleService.deleteSchedule(id, passwordDTO.getPassword());
+	public ResponseEntity<ResponseMessage<Long>> deleteSchedule(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+		Long responseData = scheduleService.deleteSchedule(id, userDetails.getUser());
 
 		ResponseMessage<Long> responseMessage = ResponseMessage.<Long>builder()
 			.statusCode(HttpStatus.OK.value())

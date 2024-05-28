@@ -9,14 +9,18 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sparta.schedule.dto.ScheduleRequestDTO;
 import com.sparta.schedule.dto.ScheduleResponseDTO;
 import com.sparta.schedule.entity.Schedule;
-import com.sparta.schedule.exception.InvalidPasswordException;
+import com.sparta.schedule.entity.UploadFile;
+import com.sparta.schedule.entity.User;
 import com.sparta.schedule.exception.ScheduleNotFoundException;
+import com.sparta.schedule.exception.TokenException;
 import com.sparta.schedule.repository.ScheduleRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional(readOnly = true)
+@Slf4j(topic = "ScheduleLog")
 @RequiredArgsConstructor
 public class ScheduleService {
 	private final ScheduleRepository scheduleRepository;
@@ -25,9 +29,10 @@ public class ScheduleService {
 	1. 일정 추가
 	 */
 	@Transactional
-	public ScheduleResponseDTO saveSchedule(ScheduleRequestDTO requestDTO) {
-		Schedule schedule = requestDTO.toEntity();
+	public ScheduleResponseDTO saveSchedule(ScheduleRequestDTO requestDTO, User user, UploadFile uploadFile) {
+		Schedule schedule = requestDTO.toEntity(user, uploadFile);
 		Schedule saveSchedule = scheduleRepository.save(schedule);
+		log.info("scheduleId = {}, message = {}", saveSchedule.getId(), "일정이 추가되었습니다.");
 
 		return new ScheduleResponseDTO(saveSchedule);
 	}
@@ -50,6 +55,7 @@ public class ScheduleService {
 	 */
 	public ScheduleResponseDTO getSchedule(Long id) {
 		Schedule schedule = findScheduleById(id);
+		log.info("scheduleId = {}, message = {}", schedule.getId(), "일정 조회가 완료되었습니다.");
 		return new ScheduleResponseDTO(schedule);
 	}
 
@@ -57,11 +63,11 @@ public class ScheduleService {
 	4. 선택한 일정 수정
 	 */
 	@Transactional
-	public ScheduleResponseDTO updateSchedule(Long id, ScheduleRequestDTO requestDTO) {
+	public ScheduleResponseDTO updateSchedule(Long id, ScheduleRequestDTO requestDTO, User user, UploadFile file) {
 		Schedule schedule = findScheduleById(id);
-		validatePassword(schedule, requestDTO.getPassword());
-
-		schedule.update(requestDTO);
+		validateUser(schedule, user);
+		schedule.update(requestDTO, file);
+		log.info("scheduleId = {}, message = {}", schedule.getId(), "일정이 수정되었습니다.");
 		return new ScheduleResponseDTO(schedule);
 	}
 
@@ -69,11 +75,11 @@ public class ScheduleService {
 	5. 선택한 일정 삭제
 	 */
 	@Transactional
-	public Long deleteSchedule(Long id, String password) {
+	public Long deleteSchedule(Long id, User user) {
 		Schedule schedule = findScheduleById(id);
-		validatePassword(schedule, password);
-
+		validateUser(schedule, user);
 		scheduleRepository.delete(schedule);
+		log.info("scheduleId = {}, message = {}", schedule.getId(), "일정이 삭제되었습니다.");
 		return schedule.getId();
 	}
 
@@ -91,11 +97,11 @@ public class ScheduleService {
 	}
 
 	/*
-	비밀번호 유효성 확인
+	사용자 확인
 	 */
-	private void validatePassword(Schedule schedule, String password) {
-		if (!schedule.getPassword().equals(password)) {
-			throw new InvalidPasswordException();
+	private void validateUser(Schedule schedule, User user) {
+		if (!schedule.getUser().getId().equals(user.getId())) {
+			throw new TokenException("작성자만 삭제/수정할 수 있습니다.");
 		}
 	}
 }
