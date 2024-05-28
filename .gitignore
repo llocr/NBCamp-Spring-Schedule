@@ -1,3 +1,6 @@
+/src/main/resources/properties/env.properties
+/src/main/java/com/sparta/schedule/config/PropertyConfig.java
+
 HELP.md
 .gradle
 build/
