@@ -20,8 +20,10 @@ import com.sparta.schedule.security.UserDetailsImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 //로그인 및 JWT 생성
+@Slf4j(topic = "JwtAuthenticationFilter")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	private final JwtUtil jwtUtil;
 
@@ -43,8 +45,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 				)
 			);
 		} catch (EOFException e) {
+			log.error("로그인 요청이 비어 있거나 불완전합니다.");
 			throw new LoginException("로그인 요청이 비어 있거나 불완전합니다.");
 		} catch (IOException e) {
+			log.error("회원을 찾을 수 없습니다.");
 			throw new LoginException("회원을 찾을 수 없습니다.");
 		}
 	}
@@ -63,6 +67,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		jwtUtil.saveRefreshToken(refreshToken.substring(7));
 
 		ResponseEntity<ResponseMessage<String>> responseEntity = createResponseEntity(HttpStatus.OK, "로그인에 성공했습니다.", authResult);
+		log.info("User = {}, message ={}", username, "로그인에 성공했습니다.");
 
 		String jsonResponse = new ObjectMapper().writeValueAsString(responseEntity.getBody());
 		response.setContentType("application/json");
@@ -73,6 +78,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
+		log.error("{}: {}", failed.getClass().getSimpleName(), failed.getMessage());
 		response.setCharacterEncoding("UTF-8");
 		response.setStatus(HttpStatus.UNAUTHORIZED.value());
 		response.getWriter().write("회원을 찾을 수 없습니다.");

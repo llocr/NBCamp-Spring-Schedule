@@ -16,9 +16,11 @@ import com.sparta.schedule.exception.TokenException;
 import com.sparta.schedule.repository.ScheduleRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional(readOnly = true)
+@Slf4j(topic = "ScheduleLog")
 @RequiredArgsConstructor
 public class ScheduleService {
 	private final ScheduleRepository scheduleRepository;
@@ -30,6 +32,7 @@ public class ScheduleService {
 	public ScheduleResponseDTO saveSchedule(ScheduleRequestDTO requestDTO, User user, UploadFile uploadFile) {
 		Schedule schedule = requestDTO.toEntity(user, uploadFile);
 		Schedule saveSchedule = scheduleRepository.save(schedule);
+		log.info("scheduleId = {}, message = {}", saveSchedule.getId(), "일정이 추가되었습니다.");
 
 		return new ScheduleResponseDTO(saveSchedule);
 	}
@@ -52,6 +55,7 @@ public class ScheduleService {
 	 */
 	public ScheduleResponseDTO getSchedule(Long id) {
 		Schedule schedule = findScheduleById(id);
+		log.info("scheduleId = {}, message = {}", schedule.getId(), "일정 조회가 완료되었습니다.");
 		return new ScheduleResponseDTO(schedule);
 	}
 
@@ -62,8 +66,8 @@ public class ScheduleService {
 	public ScheduleResponseDTO updateSchedule(Long id, ScheduleRequestDTO requestDTO, User user, UploadFile file) {
 		Schedule schedule = findScheduleById(id);
 		validateUser(schedule, user);
-
 		schedule.update(requestDTO, file);
+		log.info("scheduleId = {}, message = {}", schedule.getId(), "일정이 수정되었습니다.");
 		return new ScheduleResponseDTO(schedule);
 	}
 
@@ -74,8 +78,8 @@ public class ScheduleService {
 	public Long deleteSchedule(Long id, User user) {
 		Schedule schedule = findScheduleById(id);
 		validateUser(schedule, user);
-
 		scheduleRepository.delete(schedule);
+		log.info("scheduleId = {}, message = {}", schedule.getId(), "일정이 삭제되었습니다.");
 		return schedule.getId();
 	}
 

@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 // JWT 검증 및 인가
-@Slf4j(topic = "JWT 검증 및 인가")
+@Slf4j(topic = "JwtAuthorizationFilter")
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
@@ -44,6 +44,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 				try {
 					setAuthentication(info.getSubject());
 				} catch (Exception e) {
+					log.error("username = {}, message = {}", info.getSubject(), "인증 정보를 찾을 수 없습니다.");
 					throw new TokenException("인증 정보를 찾을 수 없습니다.");
 				}
 
@@ -51,17 +52,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 				//재발급 후 컨텍스트에 다시 넣기
 				//리프레시 토큰 검증
 				boolean validateRefreshToken = jwtUtil.validateToken(refreshToken);
-				log.info("validateRefreshToken : " + validateRefreshToken);
 
 				//리프레시 토큰 저장소 존재유무 확인
 				boolean isRefreshToken = jwtUtil.existRefreshToken(refreshToken);
-				log.info("refreshToken : " + isRefreshToken);
 
 				if (validateRefreshToken && isRefreshToken) {
 					Claims info = jwtUtil.getUserInfoFromToken(refreshToken);
 
 					UserRole role = UserRole.valueOf(info.getAudience());
-					log.info("role : " + role.name());
 
 					String newAccessToken = jwtUtil.createToken(info.getSubject(), role);
 					jwtUtil.setHeaderAccessToken(response, newAccessToken);
@@ -69,6 +67,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 					try {
 						setAuthentication(info.getSubject());
 					} catch (Exception e) {
+						log.error("username = {}, message = {}", info.getSubject(), "인증 정보를 찾을 수 없습니다.");
 						throw new TokenException("인증 정보를 찾을 수 없습니다.");
 					}
 				} else {

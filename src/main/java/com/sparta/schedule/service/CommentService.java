@@ -18,9 +18,11 @@ import com.sparta.schedule.repository.CommentRepository;
 import com.sparta.schedule.repository.ScheduleRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional(readOnly = true)
+@Slf4j
 @RequiredArgsConstructor
 public class CommentService {
 	private final CommentRepository commentRepository;
@@ -37,6 +39,8 @@ public class CommentService {
 		Comment comment = requestDTO.toEntity(requestDTO, user, schedule);
 		commentRepository.save(comment);
 
+		log.info("commentId = {}, message = {}", comment.getId(), "댓글이 추가되었습니다.");
+
 		return new CommentResponseDTO(comment);
 	}
 
@@ -50,6 +54,8 @@ public class CommentService {
 		//댓글 존재하는지 확인
 		Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
+		log.info("commentId = {}, message = {}", comment.getId(), "댓글 조회가 완료되었습니다.");
+
 		return new CommentResponseDTO(comment);
 	}
 
@@ -62,6 +68,7 @@ public class CommentService {
 
 		List<Comment> commentList = commentRepository.findAllByScheduleId(scheduleId);
 		if (!commentList.isEmpty()) {
+			log.info("scheduleId = {}, message = {}", scheduleId, "댓글 조회가 완료되었습니다.");
 			return commentList.stream().map(CommentResponseDTO::new).toList();
 		} else {
 			throw new CommentNotFoundException();
@@ -80,6 +87,8 @@ public class CommentService {
 		Comment comment = findCommentById(commentId, user.getId());
 		comment.update(requestDTO);
 
+		log.info("commentId = {}, message = {}", comment.getId(), "댓글이 수정되었습니다.");
+
 		return new CommentResponseDTO(comment);
 	}
 
@@ -95,12 +104,14 @@ public class CommentService {
 		Comment comment = findCommentById(commentId, user.getId());
 		commentRepository.delete(comment);
 
+		log.info("commentId = {}, message = {}", comment.getId(), "댓글이 삭제되었습니다.");
+
 		return commentId;
 	}
+
 	/*
 	아이디로 스케줄 찾기
 	 */
-
 	private Schedule findScheduleById(Long scheduleId) {
 		Optional<Schedule> findSchedule = scheduleRepository.findById(scheduleId);
 		if (findSchedule.isPresent()) {

@@ -25,8 +25,10 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j(topic = "JwtUtil")
 public class JwtUtil {
 	public static final String AUTHORIZATION_HEADER = "Authorization";
 	public static final String REFRESHTOKEN_HEADER = "RefreshToken";
@@ -106,6 +108,7 @@ public class JwtUtil {
 			return true;
 		} catch (SecurityException | MalformedJwtException | SignatureException |
 				 ExpiredJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+			log.error("exception = {}", e.getMessage());
 			return false;
 		}
 	}

@@ -14,10 +14,12 @@ import com.sparta.schedule.exception.UserException;
 import com.sparta.schedule.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j(topic = "UserLog")
 public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
@@ -42,6 +44,7 @@ public class UserService {
 		//DB에 저장
 		User saveUser = userRepository.save(user);
 
+		log.info("username = {}, message = {}", saveUser.getUsername(), "회원가입이 완료되었습니다.");
 		return new UserResponseDTO(saveUser);
 	}
 
