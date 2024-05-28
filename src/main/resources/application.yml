@@ -2,7 +2,7 @@ spring:
   application:
     name: nbcamp-spring-schedule
   datasource:
-    url: jdbc:mysql://localhost:3306/nbcamp
+    url: jdbc:mysql://nbcamp-heesue.cp06s820ydxn.ap-southeast-2.rds.amazonaws.com/nbcamp
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
