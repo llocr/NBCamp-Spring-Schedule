@@ -2,16 +2,27 @@ package com.sparta.schedule.service;
 
 import java.util.Optional;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sparta.schedule.dto.LoginRequestDTO;
+import com.sparta.schedule.dto.LoginResponseDTO;
 import com.sparta.schedule.dto.UserRequestDTO;
 import com.sparta.schedule.dto.UserResponseDTO;
 import com.sparta.schedule.entity.User;
 import com.sparta.schedule.entity.UserRole;
+import com.sparta.schedule.exception.LoginException;
 import com.sparta.schedule.exception.UserException;
+import com.sparta.schedule.jwt.JwtUtil;
+import com.sparta.schedule.repository.LoginHistoryRepository;
 import com.sparta.schedule.repository.UserRepository;
+import com.sparta.schedule.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j(topic = "UserLog")
 public class UserService {
+	private final JwtUtil jwtUtil;
+	private final AuthenticationManager authenticationManager;
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
@@ -46,6 +59,30 @@ public class UserService {
 
 		log.info("username = {}, message = {}", saveUser.getUsername(), "회원가입이 완료되었습니다.");
 		return new UserResponseDTO(saveUser);
+	}
+
+	@Transactional
+	public LoginResponseDTO login(LoginRequestDTO requestDTO) {
+		try {
+			Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(
+					requestDTO.getUsername(),
+					requestDTO.getPassword()));
+
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+
+			String username = ((UserDetailsImpl)authentication.getPrincipal()).getUsername();
+			UserRole role = ((UserDetailsImpl)authentication.getPrincipal()).getUser().getUserRole();
+
+			String accessToken = jwtUtil.createToken(username, role);
+			String refreshToken = jwtUtil.createRefreshToken(username, role);
+
+			jwtUtil.saveRefreshToken(refreshToken.substring(7));
+
+			return new LoginResponseDTO(username, accessToken, refreshToken);
+		} catch (AuthenticationException e) {
+			throw new LoginException("회원을 찾을 수 없습니다.");
+		}
 	}
 
 	/*
