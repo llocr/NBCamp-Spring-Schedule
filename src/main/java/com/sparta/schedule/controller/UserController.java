@@ -12,7 +12,6 @@ import com.sparta.schedule.dto.LoginResponseDTO;
 import com.sparta.schedule.dto.ResponseMessage;
 import com.sparta.schedule.dto.UserRequestDTO;
 import com.sparta.schedule.dto.UserResponseDTO;
-import com.sparta.schedule.exception.LoginException;
 import com.sparta.schedule.jwt.JwtUtil;
 import com.sparta.schedule.service.UserService;
 
@@ -46,23 +45,19 @@ public class UserController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<ResponseMessage<String>> login(HttpServletResponse response, @Valid @RequestBody LoginRequestDTO requestDTO) {
-		try {
-			LoginResponseDTO responseDTO = userService.login(requestDTO);
+	public ResponseEntity<ResponseMessage<String>> login(HttpServletResponse response,
+		@Valid @RequestBody LoginRequestDTO requestDTO) {
+		LoginResponseDTO responseDTO = userService.login(requestDTO);
 
-			response.addHeader(JwtUtil.AUTHORIZATION_HEADER, responseDTO.getAccessToken());
-			response.addHeader(JwtUtil.REFRESHTOKEN_HEADER, responseDTO.getRefreshToken());
+		response.addHeader(JwtUtil.AUTHORIZATION_HEADER, responseDTO.getAccessToken());
+		response.addHeader(JwtUtil.REFRESHTOKEN_HEADER, responseDTO.getRefreshToken());
 
-			ResponseMessage<String> responseMessage = ResponseMessage.<String>builder()
-				.statusCode(HttpStatus.OK.value())
-				.message("로그인에 성공했습니다.")
-				.data(responseDTO.getUsername())
-				.build();
+		ResponseMessage<String> responseMessage = ResponseMessage.<String>builder()
+			.statusCode(HttpStatus.OK.value())
+			.message("로그인에 성공했습니다.")
+			.data(responseDTO.getUsername())
+			.build();
 
-			return new ResponseEntity<>(responseMessage, HttpStatus.OK);
-		} catch (LoginException e) {
-			log.error("message = {}", "로그인 요청이 비어 있거나 불완전합니다.");
-			throw new LoginException("로그인 요청이 비어 있거나 불완전합니다.");
-		}
+		return new ResponseEntity<>(responseMessage, HttpStatus.OK);
 	}
 }
