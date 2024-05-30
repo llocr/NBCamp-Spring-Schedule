@@ -3,6 +3,7 @@ package com.sparta.schedule.service;
 import java.io.IOException;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sparta.schedule.entity.UploadFile;
@@ -13,10 +14,12 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class FileUploadService {
 
 	private final UploadFileRepository fileRepository;
 
+	@Transactional
 	public UploadFile storeFile(MultipartFile file) {
 		String extension = validateImage(file);
 		int size = validateSize(file);
