@@ -1,188 +1,219 @@
 package com.sparta.schedule.service;
 
-import com.sparta.schedule.dto.ScheduleRequestDTO;
-import com.sparta.schedule.dto.ScheduleResponseDTO;
-import com.sparta.schedule.exception.InvalidPasswordException;
-import com.sparta.schedule.exception.ScheduleNotFoundException;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import com.sparta.schedule.dto.ScheduleRequestDTO;
+import com.sparta.schedule.dto.ScheduleResponseDTO;
+import com.sparta.schedule.entity.UploadFile;
+import com.sparta.schedule.entity.User;
+import com.sparta.schedule.exception.ScheduleNotFoundException;
+import com.sparta.schedule.repository.UserRepository;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class ScheduleServiceTest {
-    @Autowired
-    private ScheduleService scheduleService;
+	@Autowired
+	private ScheduleService scheduleService;
+	@Autowired
+	private UserRepository userRepository;
+	
+	void 스케줄저장() {
+		ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
+		requestDTO.setTitle("테스트입니다.");
+		requestDTO.setContents("오늘의 스케줄은 없습니다.");
 
-    @Test
-    @Transactional
-    @DisplayName("스케줄 저장 테스트")
-    void 스케줄저장() {
-        //given
-        ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
-        requestDTO.setTitle("테스트입니다.");
-        requestDTO.setContents("오늘의 스케줄은 없습니다.");
-        requestDTO.setEmail("heesue");
-        requestDTO.setPassword("1234");
+		User user1 = userRepository.findById(2L).orElseThrow();
+		User user2 = userRepository.findById(3L).orElseThrow();
 
-        //when
-        ScheduleResponseDTO scheduleResponseDTO = scheduleService.saveSchedule(requestDTO);
+		UploadFile file1 = new UploadFile();
+		file1.setName("test");
+		file1.setExtension("image/png");
+		file1.setSize(5);
+		file1.setContent(new byte[5]);
 
-        //then
-        assertThat(requestDTO.getTitle()).isEqualTo(scheduleResponseDTO.getTitle());
-        assertThat(requestDTO.getContents()).isEqualTo(scheduleResponseDTO.getContents());
-        assertThat(requestDTO.getEmail()).isEqualTo(scheduleResponseDTO.getEmail());
-    }
+		UploadFile file2 = new UploadFile();
+		file2.setName("test2");
+		file2.setExtension("image/png");
+		file2.setSize(5);
+		file2.setContent(new byte[5]);
 
-    @Test
-    @DisplayName("선택된 스케줄 조회 성공 테스트")
-    void 선택된스케줄조회성공() {
-        //given
-        Long id = 2L;
+		scheduleService.saveSchedule(requestDTO, user1, file1);
+		scheduleService.saveSchedule(requestDTO, user1, null);
+		scheduleService.saveSchedule(requestDTO, user1, null);
+		scheduleService.saveSchedule(requestDTO, user2, file2);
+		scheduleService.saveSchedule(requestDTO, user2, null);
+		scheduleService.saveSchedule(requestDTO, user2, null);
+	}
 
-        //when
-        ScheduleResponseDTO findSchedule = scheduleService.getSchedule(id);
+	@Test
+	@Transactional
+	@DisplayName("스케줄 저장 성공 테스트")
+	void 스케줄저장성공() {
+		//given
+		ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
+		requestDTO.setTitle("테스트입니다.");
+		requestDTO.setContents("오늘의 스케줄은 없습니다.");
 
-        //then
-        assertThat(id).isEqualTo(findSchedule.getId());
-    }
+		User user = userRepository.findById(2L).orElseThrow();
 
-    @Test
-    @DisplayName("선택된 스케줄 조회 실패 테스트")
-    void 선택된스케줄조회실패() {
-        //given
-        Long id = 0L;
+		UploadFile file = new UploadFile();
+		file.setName("test");
+		file.setExtension("image/png");
+		file.setSize(5);
+		file.setContent(new byte[5]);
 
-        //when
-        ScheduleNotFoundException scheduleNotFoundException =
-                assertThrows(ScheduleNotFoundException.class, () -> scheduleService.getSchedule(id));
+		//when
+		ScheduleResponseDTO responseDTO = scheduleService.saveSchedule(requestDTO, user, file);
 
-        //then
-        assertThat(scheduleNotFoundException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
-    }
+		//then
+		assertThat(requestDTO.getTitle()).isEqualTo(responseDTO.getTitle());
+		assertThat(user.getUsername()).isEqualTo(responseDTO.getUsername());
+	}
 
-    @Test
-    @DisplayName("등록된 전체 스케줄 조회 테스트")
-    void 전체스케줄조회테스트() {
-        //when
-        List<ScheduleResponseDTO> scheduleList = scheduleService.getAllSchedules();
+	@Test
+	@DisplayName("선택된 스케줄 조회 성공 테스트")
+	void 선택된스케줄조회성공() {
+		//given
+		Long id = 2L;
 
-        //then
-        assertThat(scheduleList).isNotEmpty();
-    }
+		//when
+		ScheduleResponseDTO responseDTO = scheduleService.getSchedule(id);
 
-    @Test
-    @Transactional
-    @DisplayName("스케줄 수정 테스트")
-    void 스케줄수정성공테스트() {
-        //given
-        Long id = 2L;
-        ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
-        requestDTO.setTitle("수정된 테스트입니다.");
-        requestDTO.setContents("오늘의 스케줄은 무엇일까요?");
-        requestDTO.setEmail("heesue");
-        requestDTO.setPassword("1234");
+		//then
+		assertThat(id).isEqualTo(responseDTO.getId());
+	}
 
-        //when
-        ScheduleResponseDTO updateSchedule = scheduleService.updateSchedule(id, requestDTO);
+	@Test
+	@DisplayName("선택된 스케줄 조회 실패 테스트")
+	void 선택된스케줄조회실패() {
+		//given
+		Long id = 0L;
 
-        //then
-        assertThat(requestDTO.getTitle()).isEqualTo(updateSchedule.getTitle());
-        assertThat(requestDTO.getContents()).isEqualTo(updateSchedule.getContents());
-        assertThat(requestDTO.getEmail()).isEqualTo(updateSchedule.getEmail());
-    }
+		//when
+		assertThatException().isThrownBy(() -> scheduleService.getSchedule(id));
+	}
 
-    @Test
-    @Transactional
-    @DisplayName("스케줄 수정 실패 테스트_비밀번호오류")
-    void 스케줄수정실패테스트_비밀번호오류() {
-        //given
-        Long id = 2L;
-        ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
-        requestDTO.setTitle("수정된 테스트입니다.");
-        requestDTO.setContents("오늘의 스케줄은 무엇일까요?");
-        requestDTO.setEmail("heesue");
-        requestDTO.setPassword("12345");
+	@Test
+	@DisplayName("등록된 전체 스케줄 조회 테스트")
+	void 전체스케줄조회테스트() {
+		//when
+		List<ScheduleResponseDTO> scheduleList = scheduleService.getAllSchedules();
 
-        //when
-        InvalidPasswordException invalidPasswordException =
-                assertThrows(InvalidPasswordException.class, () -> scheduleService.updateSchedule(id, requestDTO));
+		//then
+		assertThat(scheduleList).isNotEmpty();
+	}
 
-        //then
-        assertThat(invalidPasswordException.getMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
-    }
+	@Test
+	@Transactional
+	@DisplayName("스케줄 수정 테스트")
+	void 스케줄수정성공테스트() {
+		//given
+		Long id = 2L;
+		ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
+		requestDTO.setTitle("수정된 테스트입니다.");
+		requestDTO.setContents("오늘의 스케줄은 무엇일까요?");
 
-    @Test
-    @Transactional
-    @DisplayName("스케줄 수정 실패 테스트_해당스케줄없음")
-    void 스케줄수정실패테스트_해당스케줄없음() {
-        //given
-        Long id = 0L;
-        ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
-        requestDTO.setTitle("수정된 테스트입니다.");
-        requestDTO.setContents("오늘의 스케줄은 무엇일까요?");
-        requestDTO.setEmail("heesue");
-        requestDTO.setPassword("1234");
+		User user = userRepository.findById(2L).orElseThrow();
 
-        //when
-        ScheduleNotFoundException scheduleNotFoundException =
-                assertThrows(ScheduleNotFoundException.class, () -> scheduleService.updateSchedule(id, requestDTO));
+		UploadFile file = new UploadFile();
+		file.setName("test");
+		file.setExtension("image/png");
+		file.setSize(5);
+		file.setContent(new byte[5]);
 
-        //then
-        assertThat(scheduleNotFoundException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
-    }
+		//when
+		ScheduleResponseDTO responseDTO = scheduleService.updateSchedule(id, requestDTO, user, file);
 
-    @Test
-    @Transactional
-    @DisplayName("스케줄 삭제 성공 테스트")
-    void 스케줄삭제성공테스트() {
-        //given
-        Long id = 2L;
-        String password = "1234";
+		//then
+		assertThat(requestDTO.getTitle()).isEqualTo(responseDTO.getTitle());
+		assertThat(user.getUsername()).isEqualTo(responseDTO.getUsername());
+	}
 
-        //when
-        Long deleteSchedule = scheduleService.deleteSchedule(id, password);
+	@Test
+	@Transactional
+	@DisplayName("스케줄 수정 실패 테스트_작성자 불일치")
+	void 스케줄수정실패테스트_작성자불일치() {
+		//given
+		Long id = 2L;
+		ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
+		requestDTO.setTitle("수정된 테스트입니다.");
+		requestDTO.setContents("오늘의 스케줄은 무엇일까요?");
 
-        //then
-        assertThat(id).isEqualTo(deleteSchedule);
-    }
+		User user = userRepository.findById(3L).orElseThrow();
 
-    @Test
-    @Transactional
-    @DisplayName("스케줄 삭제 실패 테스트_비밀번호오류")
-    void 스케줄삭제실패테스트_비밀번호오류() {
-        //given
-        Long id = 2L;
-        String password = "5678";
+		//when & then
+		assertThatException().isThrownBy(() -> scheduleService.updateSchedule(id, requestDTO, user, null));
+	}
 
-        //when
-        InvalidPasswordException invalidPasswordException =
-                assertThrows(InvalidPasswordException.class, () -> scheduleService.deleteSchedule(id, password));
+	@Test
+	@Transactional
+	@DisplayName("스케줄 수정 실패 테스트_해당스케줄없음")
+	void 스케줄수정실패테스트_해당스케줄없음() {
+		//given
+		Long id = 0L;
+		ScheduleRequestDTO requestDTO = new ScheduleRequestDTO();
+		requestDTO.setTitle("수정된 테스트입니다.");
+		requestDTO.setContents("오늘의 스케줄은 무엇일까요?");
 
-        //then
-        assertThat(invalidPasswordException.getMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
-    }
+		User user = userRepository.findById(2L).orElseThrow();
 
-    @Test
-    @Transactional
-    @DisplayName("스케줄 삭제 실패 테스트_해당스케줄없음")
-    void 스케줄삭제실패테스트_해당스케줄없음() {
-        //given
-        Long id = 0L;
-        String password = "1234";
+		//when
+		assertThatException().isThrownBy(() -> scheduleService.updateSchedule(id, requestDTO, user, null));
+	}
 
-        //when
-        ScheduleNotFoundException scheduleNotFoundException =
-                assertThrows(ScheduleNotFoundException.class, () -> scheduleService.deleteSchedule(id, password));
+	@Test
+	@Transactional
+	@DisplayName("스케줄 삭제 성공 테스트")
+	void 스케줄삭제성공테스트() {
+		//given
+		Long id = 2L;
 
-        //then
-        assertThat(scheduleNotFoundException.getMessage()).isEqualTo("해당 스케줄이 존재하지 않습니다.");
-    }
+		User user = userRepository.findById(2L).orElseThrow();
+
+		//when
+		Long responseData = scheduleService.deleteSchedule(id, user);
+
+		//then
+		assertThat(id).isEqualTo(responseData);
+	}
+
+	@Test
+	@Transactional
+	@DisplayName("스케줄 삭제 실패 테스트_작성자 불일치")
+	void 스케줄삭제실패테스트_작성자불일치() {
+		//given
+		Long id = 2L;
+
+		User user = userRepository.findById(3L).orElseThrow();
+
+		//when
+		assertThatException().isThrownBy(() -> scheduleService.deleteSchedule(id, user));
+	}
+
+	@Test
+	@Transactional
+	@DisplayName("스케줄 삭제 실패 테스트_해당스케줄없음")
+	void 스케줄삭제실패테스트_해당스케줄없음() {
+		//given
+		Long id = 0L;
+		User user = userRepository.findById(2L).orElseThrow();
+
+		//when
+		ScheduleNotFoundException scheduleNotFoundException =
+			assertThrows(ScheduleNotFoundException.class, () -> scheduleService.deleteSchedule(id, user));
+
+		//then
+		assertThatException().isThrownBy(() -> scheduleService.deleteSchedule(id, user));
+	}
 }
