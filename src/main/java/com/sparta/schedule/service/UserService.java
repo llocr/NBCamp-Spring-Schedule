@@ -15,6 +15,7 @@ import com.sparta.schedule.dto.LoginRequestDTO;
 import com.sparta.schedule.dto.LoginResponseDTO;
 import com.sparta.schedule.dto.UserRequestDTO;
 import com.sparta.schedule.dto.UserResponseDTO;
+import com.sparta.schedule.entity.LoginHistory;
 import com.sparta.schedule.entity.User;
 import com.sparta.schedule.entity.UserRole;
 import com.sparta.schedule.exception.LoginException;
@@ -35,6 +36,7 @@ public class UserService {
 	private final JwtUtil jwtUtil;
 	private final AuthenticationManager authenticationManager;
 	private final UserRepository userRepository;
+	private final LoginHistoryRepository loginHistoryRepository;
 	private final PasswordEncoder passwordEncoder;
 
 	/*
@@ -57,17 +59,22 @@ public class UserService {
 		//DB에 저장
 		User saveUser = userRepository.save(user);
 
+		//회원가입이 성공하면 LoginHistory 생성 후 저장
+		LoginHistory loginHistory = new LoginHistory(user.getUsername());
+		loginHistoryRepository.save(loginHistory);
+
 		log.info("username = {}, message = {}", saveUser.getUsername(), "회원가입이 완료되었습니다.");
 		return new UserResponseDTO(saveUser);
 	}
 
-	@Transactional
+	@Transactional(noRollbackFor = LoginException.class)
 	public LoginResponseDTO login(LoginRequestDTO requestDTO) {
 		try {
 			Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
 					requestDTO.getUsername(),
-					requestDTO.getPassword()));
+					requestDTO.getPassword())
+			);
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -104,7 +111,7 @@ public class UserService {
 	}
 
 	/*
-	usename 중복 검사
+	username 중복 검사
 	 */
 	private void validateUserName(String username) {
 		Optional<User> findUser = userRepository.findByUsername(username);
