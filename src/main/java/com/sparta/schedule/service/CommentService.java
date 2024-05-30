@@ -54,6 +54,9 @@ public class CommentService {
 		//댓글 존재하는지 확인
 		Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
+		//댓글이 해당 게시물의 것인지 확인
+		checkScheduleAndComment(scheduleId, comment);
+
 		log.info("commentId = {}, message = {}", comment.getId(), "댓글 조회가 완료되었습니다.");
 
 		return new CommentResponseDTO(comment);
@@ -85,6 +88,10 @@ public class CommentService {
 
 		//댓글 존재하는지 & 댓글 작성자인지 확인
 		Comment comment = findCommentById(commentId, user.getId());
+
+		//댓글이 해당 게시물의 것인지 확인
+		checkScheduleAndComment(scheduleId, comment);
+
 		comment.update(requestDTO);
 
 		log.info("commentId = {}, message = {}", comment.getId(), "댓글이 수정되었습니다.");
@@ -133,4 +140,12 @@ public class CommentService {
 		}
 	}
 
+	/*
+	댓글이 해당 스케줄의 것인지 확인
+	 */
+	private static void checkScheduleAndComment(Long scheduleId, Comment comment) {
+		if (!comment.getSchedule().getId().equals(scheduleId)) {
+			throw new CommentNotFoundException();
+		}
+	}
 }
